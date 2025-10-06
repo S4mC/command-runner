@@ -2,11 +2,8 @@
 
 With this extension, you can run code snippets from markdown and plaintext files with powerful customization options.
 
-![Screenshot](screenshot.PNG)
+<img width="1218" height="533" alt="image" src="https://github.com/user-attachments/assets/8f9484fa-723d-4de9-ab7f-513e392f1822" />
 
-## Requirements
-
-- Visual Studio Code 1.48+
 
 ## How to Use
 
@@ -66,17 +63,10 @@ run test`npm test -- --watch`(Watch Tests)
 - Works in **Markdown** and **Plain Text** files
 - Simple syntax: just add a name before backticks
 - Named terminals persist - reuse them for related commands
-- Supports single (````), double (``````), and triple (``````````) backticks
+- Supports single (\`command\`), double (\``command``), and triple (\```command```) backticks
 - **Custom display names** - personalize button text with parentheses syntax
 - Use descriptive names for better visual organization
 - ▶︎ symbol always visible for quick identification
-
-## To-Dos
-
-- [ ] Work with two runnables on one line.
-- [ ] Add support for multi-line code blocks with multiple runnables.
-- [ ] Support custom regex expressions.
-- [ ] Add language filters.
 
 ## Release Notes
 
@@ -90,7 +80,7 @@ run test`npm test -- --watch`(Watch Tests)
 ### 0.2.0
 
 - Added support for named terminals
-- Extension now activates in any file
+- Extension now activates in only markdown and plain text files
 - Simplified syntax: any text before backticks becomes the terminal name
 
 ### 0.1.0
