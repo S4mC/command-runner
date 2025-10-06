@@ -14,7 +14,8 @@ let disposables: Disposable[] = [];
 export function activate(context: ExtensionContext) {
   const codelensProvider = new CodelensProvider();
 
-  languages.registerCodeLensProvider("*", codelensProvider);
+  languages.registerCodeLensProvider({ language: "markdown" }, codelensProvider);
+  languages.registerCodeLensProvider({ language: "plaintext" }, codelensProvider);
 
   commands.registerCommand("command-runner.enableCodeLens", () => {
     workspace
@@ -28,8 +29,8 @@ export function activate(context: ExtensionContext) {
       .update("enableCodeLens", false, true);
   });
 
-  commands.registerCommand("command-runner.codelensAction", (args: any) => {
-    Terminal.run(args);
+  commands.registerCommand("command-runner.codelensAction", (command: string, terminalName?: string) => {
+    Terminal.run(command, terminalName);
   });
 }
 

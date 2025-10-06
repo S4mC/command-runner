@@ -1,13 +1,13 @@
 {
   "name": "command-runner",
   "displayName": "Command Runner",
-  "description": "Run commands in the terminal from any file.",
-  "publisher": "zvik",
-  "version": "0.1.2",
+  "description": "Run commands in the terminal from markdowns and plain text files with custom display names and named terminals.",
+  "publisher": "s4mu31",
+  "version": "0.3.0",
   "license": "MIT",
   "icon": "icon.png",
   "engines": {
-    "vscode": "^1.48.0"
+    "vscode": "^1.104.0"
   },
   "repository": {
     "type": "git",
@@ -20,10 +20,15 @@
     "terminal",
     "cmd",
     "markdown",
-    "run"
+    "run",
+    "codelens",
+    "command execution",
+    "named terminals",
+    "custom display"
   ],
   "activationEvents": [
-    "*"
+    "onLanguage:Markdown",
+    "onLanguage:plaintext"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -43,7 +48,18 @@
       "properties": {
         "command-runner.enableCodeLens": {
           "type": "boolean",
-          "default": true
+          "default": true,
+          "description": "Enable or disable CodeLens for command execution"
+        },
+        "command-runner.maxDisplayLength": {
+          "type": "number",
+          "default": 15,
+          "description": "Maximum length for command display in CodeLens before truncation"
+        },
+        "command-runner.maxCustomNameLength": {
+          "type": "number",
+          "default": 50,
+          "description": "Maximum length for custom display names before truncation"
         }
       }
     }
@@ -54,19 +70,19 @@
     "lint": "eslint src --ext ts",
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
-    "test": "node ./out/test/runTest.js"
+    "test": "mocha out/test/suite/**/*.test.js"
   },
   "devDependencies": {
-    "@types/vscode": "^1.48.0",
-    "@types/glob": "^7.1.3",
-    "@types/mocha": "^8.0.0",
-    "@types/node": "^14.0.27",
-    "eslint": "^7.6.0",
-    "@typescript-eslint/eslint-plugin": "^3.8.0",
-    "@typescript-eslint/parser": "^3.8.0",
-    "glob": "^7.1.6",
-    "mocha": "^8.0.1",
-    "typescript": "^3.8.3",
-    "vscode-test": "^1.4.0"
+    "@types/vscode": "^1.104.0",
+    "@types/glob": "^9.0.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^24.6.2",
+    "eslint": "^9.37.0",
+    "@typescript-eslint/eslint-plugin": "^8.45.0",
+    "@typescript-eslint/parser": "^8.45.0",
+    "glob": "^11.0.3",
+    "mocha": "^11.7.4",
+    "typescript": "^5.9.3",
+    "vscode-test": "^1.6.1"
   }
 }

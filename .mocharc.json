@@ -1,0 +1,5 @@
+{
+  "require": "out/test/suite/index.js",
+  "ui": "tdd",
+  "color": true
+}
