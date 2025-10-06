@@ -1,6 +1,6 @@
 {
-  "name": "command-runner",
-  "displayName": "Command Runner",
+  "name": "command-runner-v2",
+  "displayName": "Command Runner Updated",
   "description": "Run commands in the terminal from markdowns and plain text files with custom display names and named terminals.",
   "publisher": "s4mu31",
   "version": "0.3.0",
