@@ -15,10 +15,8 @@ Run tests in "test" terminal: run test`npm run test`
 
 ## Package Extension to VSIX
 
-Install vsce globally: run package-install`npm install -g @vscode/vsce`
+Install vsce globally: run package-install`npm install -g @vscode/vsce`(Install VSCE)
 
-Compile the extension: run compile`npm run compile`
-
-Package to VSIX file: run package`vsce package`
+Compile the extension: run compile`npm run compile; vsce package`(Compile and created package)
 
 The VSIX file will be created in the root directory and can be installed in VS Code via Extensions → Install from VSIX...

@@ -12,6 +12,9 @@ import { Terminal } from "./Terminal";
 let disposables: Disposable[] = [];
 
 export function activate(context: ExtensionContext) {
+  // Initialize Terminal to set up event listeners
+  Terminal.initialize();
+
   const codelensProvider = new CodelensProvider();
 
   languages.registerCodeLensProvider({ language: "markdown" }, codelensProvider);
@@ -35,6 +38,9 @@ export function activate(context: ExtensionContext) {
 }
 
 export function deactivate() {
+  // Dispose Terminal resources
+  Terminal.dispose();
+  
   if (disposables) {
     disposables.forEach((item) => item.dispose());
   }

@@ -4,6 +4,15 @@ All notable changes to the "command-runner" extension will be documented in this
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.3.1] - 2025-10-06
+
+### Fixed
+- **Terminal Management:** Fixed issue where commands would not execute after closing terminals
+- Added automatic terminal validation before command execution
+- Terminal references are now properly checked and recreated when closed
+- Improved event listener registration to prevent memory leaks
+- Terminal dispose method now properly cleans up all resources
+
 ## [0.3.0] - 2025-10-05
 
 ### Added

@@ -4,26 +4,44 @@ export class Terminal {
   static defaultTermName: string = "Command Runner";
   static defaultTerm: vscode.Terminal | undefined;
   static namedTerminals: Map<string, vscode.Terminal> = new Map();
+  static closeTerminalListenerDisposable: vscode.Disposable | undefined;
+
+  static initialize() {
+    // Register the close terminal listener only once
+    if (!Terminal.closeTerminalListenerDisposable) {
+      Terminal.closeTerminalListenerDisposable = vscode.window.onDidCloseTerminal((event) => {
+        if (event.name === Terminal.defaultTermName) {
+          Terminal.defaultTerm = undefined;
+        } else {
+          // Remove from named terminals map
+          for (const [name, term] of Terminal.namedTerminals.entries()) {
+            if (term === event) {
+              Terminal.namedTerminals.delete(name);
+              break;
+            }
+          }
+        }
+      });
+    }
+  }
+
+  static _isTerminalValid(terminal: vscode.Terminal | undefined): boolean {
+    if (!terminal) {
+      return false;
+    }
+    // Check if the terminal still exists in the active terminals
+    return vscode.window.terminals.includes(terminal);
+  }
 
   static _getDefaultTerm(): vscode.Terminal {
     try {
+      // Check if the existing terminal is still valid
+      if (Terminal.defaultTerm && !Terminal._isTerminalValid(Terminal.defaultTerm)) {
+        Terminal.defaultTerm = undefined;
+      }
+
       if (!Terminal.defaultTerm) {
         Terminal.defaultTerm = vscode.window.createTerminal(Terminal.defaultTermName);
-
-        // if user closes the terminal, delete our reference:
-        vscode.window.onDidCloseTerminal((event) => {
-          if (event.name === Terminal.defaultTermName) {
-            Terminal.defaultTerm = undefined;
-          } else {
-            // Remove from named terminals map
-            for (const [name, term] of Terminal.namedTerminals.entries()) {
-              if (term === event) {
-                Terminal.namedTerminals.delete(name);
-                break;
-              }
-            }
-          }
-        });
       }
       // Always show the terminal, even if it already existed
       Terminal.defaultTerm.show(true);
@@ -38,6 +56,13 @@ export class Terminal {
   static _getNamedTerm(name: string): vscode.Terminal {
     try {
       let term = Terminal.namedTerminals.get(name);
+      
+      // Check if the existing terminal is still valid
+      if (term && !Terminal._isTerminalValid(term)) {
+        Terminal.namedTerminals.delete(name);
+        term = undefined;
+      }
+
       if (!term) {
         term = vscode.window.createTerminal(`Command Runner: ${name}`);
         Terminal.namedTerminals.set(name, term);
@@ -75,6 +100,10 @@ export class Terminal {
   }
 
   static dispose() {
+    if (Terminal.closeTerminalListenerDisposable) {
+      Terminal.closeTerminalListenerDisposable.dispose();
+      Terminal.closeTerminalListenerDisposable = undefined;
+    }
     if (Terminal.defaultTerm) {
       Terminal.defaultTerm.dispose();
       Terminal.defaultTerm = undefined;

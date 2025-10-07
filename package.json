@@ -3,7 +3,7 @@
   "displayName": "Command Runner Updated",
   "description": "Run commands in the terminal from markdowns and plain text files with custom display names and named terminals.",
   "publisher": "s4mu31",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "license": "MIT",
   "icon": "icon.png",
   "engines": {
