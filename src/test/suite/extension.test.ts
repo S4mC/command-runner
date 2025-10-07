@@ -3,7 +3,7 @@ import * as assert from 'assert';
 suite('Extension Test Suite', () => {
 	
 	suite('Regex Pattern Tests', () => {
-		// Note: regex requires a space before 'run'
+		// Regex requires a space before 'run'
 		const regex = / run\s+(?:([\w-]+))?(`{1,3})(.*?)\2(?:\((.*?)\))?/ig;
 
 		test('Should match simple command with single backticks', () => {
