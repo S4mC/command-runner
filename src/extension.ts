@@ -69,17 +69,29 @@ function updateDecorations(editor: TextEditor | undefined) {
   }
 
   const document = editor.document;
-  const regex = / run\s+(?:([\w-]+))?(`{1,3})(.*?)\2(?:\((.*?)\))?/ig;
+  const regex = /(?:^|\s)run\s+(?:([\w-]+))?(`{1,3})([\s\S]*?)\2(?:\((.*?)\))?/gim;
   const decorations: {range: Range, hoverMessage?: string}[] = [];
   const text = document.getText();
   let matches;
 
   while ((matches = regex.exec(text)) !== null) {
-    const startPos = document.positionAt(matches.index);
-    const endPos = document.positionAt(matches.index + matches[0].length);
-    const range = new Range(startPos.translate(0, 1), endPos);
+    let matchStart = matches.index;
+    const matchEnd = matchStart + matches[0].length;
     
-    const command = matches[3];
+    // Adjust start to skip leading space or newline
+    if (matches[0].startsWith(' ')) {
+      matchStart += 1; // Skip the space
+    } else if (matches[0].startsWith('\n') || matches[0].startsWith('\r')) {
+      // Skip newline characters at the start
+      matchStart += matches[0].match(/^[\r\n]+/)?.[0].length || 0;
+    }
+    
+    const startPos = document.positionAt(matchStart);
+    const endPos = document.positionAt(matchEnd);
+    const range = new Range(startPos, endPos);
+    
+    // Trim and normalize multi-line commands
+    const command = matches[3].trim();
     const terminalName = matches[1] || '';
     const customName = matches[4] || '';
     

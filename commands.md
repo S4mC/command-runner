@@ -7,6 +7,8 @@ Install dependencies: run `npm install`
 
 You just need to run the program from **debug mode** to open a new VSC window and see the extension there.
 
+ run test`npm run test`(Test)
+
 ## Package Extension to VSIX
 
 Install vsce globally: run package-install`npm install -g @vscode/vsce`(Install VSCE)

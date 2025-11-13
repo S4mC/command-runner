@@ -155,12 +155,10 @@ export class Terminal {
         const answer = await vscode.window.showWarningMessage(
           `⚠️ This command may be dangerous: \`${processedCommand}\`\n\nAre you sure you want to execute it?`,
           { modal: true },
-          'Execute',
-          'Cancel'
+          'Execute'
         );
         
         if (answer !== 'Execute') {
-          vscode.window.showInformationMessage('Command execution cancelled');
           return;
         }
       }
@@ -173,7 +171,20 @@ export class Terminal {
         term = Terminal._getDefaultTerm();
       }
 
-      term.sendText(processedCommand, true);
+      // Check if command has multiple lines
+      const lines = processedCommand.split(/\r?\n/).filter(line => line.trim() !== '');
+      
+      if (lines.length > 1) {
+        // Execute each line separately to simulate pasting multiple commands
+        let commandToSend = '';
+        for (const line of lines) {
+          commandToSend += line.trim() + ';'; // Use semicolon to separate commands, because new lines execute immediately
+        }
+        term.sendText(commandToSend, true);
+      } else {
+        // Single line command
+        term.sendText(processedCommand, true);
+      }
       
       // Track command history
       Terminal._addToHistory(processedCommand, terminalName);

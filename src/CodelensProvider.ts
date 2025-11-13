@@ -11,10 +11,12 @@ export class CodelensProvider implements vscode.CodeLensProvider {
     ._onDidChangeCodeLenses.event;
 
   constructor() {
-    // Simplified regex using backreferences
-    // Captures: optional terminal name, backticks (1-3), command, optional custom display name in parentheses
-    // Examples: run `cmd`, run test`cmd`, run `cmd`(Custom), run test`cmd`(Custom)
-    this.regex = / run\s+(?:([\w-]+))?(`{1,3})(.*?)\2(?:\((.*?)\))?/ig;
+    // Improved regex using backreferences
+    // Detects 'run' at line start or with space before
+    // Supports triple backticks for multi-line commands
+    // Captures: optional terminal name, backticks (1-3), command (can be multi-line with ```), optional custom display name in parentheses
+    // Examples: run `cmd`, run test`cmd`, run `cmd`(Custom), run terminal```cmd```, run ```npm install```(Name)
+    this.regex = /(?:^|\s)run\s+(?:([\w-]+))?(`{1,3})([\s\S]*?)\2(?:\((.*?)\))?/gim;
 
     vscode.workspace.onDidChangeConfiguration((_) => {
       this._onDidChangeCodeLenses.fire();
@@ -40,29 +42,37 @@ export class CodelensProvider implements vscode.CodeLensProvider {
       const text = document.getText();
       let matches;
       while ((matches = regex.exec(text)) !== null) {
-        const line = document.lineAt(document.positionAt(matches.index).line);
-        const indexOf = line.text.indexOf(matches[0]);
-        const position = new vscode.Position(line.lineNumber, indexOf);
-        const range = document.getWordRangeAtPosition(
-          position,
-          new RegExp(this.regex)
-        );
-        if (range) {
-          // Extracts the terminal name (if any), the command, and custom display name (if any)
-          const terminalName = matches[1] || '';
-          const cmd: string = matches[3];
-          let customName = matches[4] || ''; // Custom name from parentheses
-          
-          // Get configuration values
-          const maxCustomNameLength = vscode.workspace
-            .getConfiguration("command-runner")
-            .get("maxCustomNameLength", 50);
-          const maxDisplayLength = vscode.workspace
-            .getConfiguration("command-runner")
-            .get("maxDisplayLength", 15);
-          const codeLensIcon = vscode.workspace
-            .getConfiguration("command-runner")
-            .get("codeLensIcon", "▶︎");
+        // Calculate positions based on the actual match index
+        let matchStart = matches.index;
+        const matchEnd = matchStart + matches[0].length;
+        
+        // Adjust start to skip leading space or newline
+        if (matches[0].startsWith(' ')) {
+          matchStart += 1; // Skip the space
+        } else if (matches[0].startsWith('\n') || matches[0].startsWith('\r')) {
+          // Skip newline characters at the start
+          matchStart += matches[0].match(/^[\r\n]+/)?.[0].length || 0;
+        }
+        
+        const startPos = document.positionAt(matchStart);
+        const endPos = document.positionAt(matchEnd);
+        const range = new vscode.Range(startPos, endPos);
+        
+        // Extracts the terminal name (if any), the command, and custom display name (if any)
+        const terminalName = matches[1] || '';
+        const cmd: string = matches[3].trim(); // Trim to handle multi-line commands
+        let customName = matches[4] || ''; // Custom name from parentheses
+        
+        // Get configuration values
+        const maxCustomNameLength = vscode.workspace
+          .getConfiguration("command-runner")
+          .get("maxCustomNameLength", 50);
+        const maxDisplayLength = vscode.workspace
+          .getConfiguration("command-runner")
+          .get("maxDisplayLength", 15);
+        const codeLensIcon = vscode.workspace
+          .getConfiguration("command-runner")
+          .get("codeLensIcon", "▶︎");
           
           // Validate and truncate custom name if too long
           if (customName && customName.length > maxCustomNameLength) {
@@ -114,7 +124,6 @@ export class CodelensProvider implements vscode.CodeLensProvider {
             arguments: [cmd, terminalName],
           };
           this.codeLenses.push(new vscode.CodeLens(range, command));
-        }
       }
       return this.codeLenses;
     }
