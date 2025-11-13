@@ -1,10 +1,20 @@
 import * as vscode from "vscode";
 
+interface CommandHistoryEntry {
+  command: string;
+  timestamp: Date;
+  terminalName: string;
+  executionCount: number;
+}
+
 export class Terminal {
   static defaultTermName: string = "Command Runner";
   static defaultTerm: vscode.Terminal | undefined;
   static namedTerminals: Map<string, vscode.Terminal> = new Map();
   static closeTerminalListenerDisposable: vscode.Disposable | undefined;
+  static commandHistory: CommandHistoryEntry[] = [];
+  static maxHistorySize: number = 50;
+  static commandStats: Map<string, { count: number; lastExecuted: Date }> = new Map();
 
   static initialize() {
     // Register the close terminal listener only once
@@ -76,11 +86,83 @@ export class Terminal {
     }
   }
 
-  static run(command: string, terminalName: string = '') {
+  static _replaceVariables(command: string): string {
+    const editor = vscode.window.activeTextEditor;
+    const workspaceFolders = vscode.workspace.workspaceFolders;
+    
+    // Replace workspace variables
+    if (workspaceFolders && workspaceFolders.length > 0) {
+      command = command.replace(/\$\{workspaceFolder\}/g, workspaceFolders[0].uri.fsPath);
+      command = command.replace(/\$\{workspaceFolderBasename\}/g, workspaceFolders[0].name);
+    }
+    
+    // Replace file-related variables
+    if (editor) {
+      const filePath = editor.document.uri.fsPath;
+      const fileName = filePath.split(/[\\/]/).pop() || '';
+      const fileBasename = fileName.replace(/\.[^.]*$/, '');
+      const fileDirname = filePath.substring(0, Math.max(filePath.lastIndexOf('\\'), filePath.lastIndexOf('/')));
+      
+      command = command.replace(/\$\{file\}/g, filePath);
+      command = command.replace(/\$\{fileBasename\}/g, fileName);
+      command = command.replace(/\$\{fileBasenameNoExtension\}/g, fileBasename);
+      command = command.replace(/\$\{fileDirname\}/g, fileDirname);
+      command = command.replace(/\$\{relativeFile\}/g, 
+        workspaceFolders ? vscode.workspace.asRelativePath(filePath) : filePath);
+    }
+    
+    return command;
+  }
+
+  static _isDangerousCommand(command: string): boolean {
+    const config = vscode.workspace.getConfiguration("command-runner");
+    const enabled = config.get("confirmDangerousCommands", true);
+    
+    if (!enabled) {
+      return false;
+    }
+    
+    const dangerousPatterns = [
+      /rm\s+-rf\s+[\/\\]/i,
+      /del\s+\/[sq]/i,
+      /format\s+/i,
+      /dd\s+if=/i,
+      /mkfs\./i,
+      />[\s]*\/dev\//i,
+      /:(){ :|:& };:/,  // Fork bomb
+      /curl.*\|\s*bash/i,
+      /wget.*\|\s*sh/i,
+      /chmod\s+777/i,
+      /sudo\s+rm/i,
+      /npm\s+install.*-g/i,
+    ];
+    
+    return dangerousPatterns.some(pattern => pattern.test(command));
+  }
+
+  static async run(command: string, terminalName: string = '') {
     try {
       if (!command || command.trim() === '') {
         vscode.window.showWarningMessage('Command Runner: Cannot execute an empty command');
         return;
+      }
+
+      // Replace variables
+      const processedCommand = Terminal._replaceVariables(command);
+      
+      // Check if command is dangerous
+      if (Terminal._isDangerousCommand(processedCommand)) {
+        const answer = await vscode.window.showWarningMessage(
+          `⚠️ This command may be dangerous: \`${processedCommand}\`\n\nAre you sure you want to execute it?`,
+          { modal: true },
+          'Execute',
+          'Cancel'
+        );
+        
+        if (answer !== 'Execute') {
+          vscode.window.showInformationMessage('Command execution cancelled');
+          return;
+        }
       }
 
       let term: vscode.Terminal;
@@ -91,12 +173,49 @@ export class Terminal {
         term = Terminal._getDefaultTerm();
       }
 
-      term.sendText(command, true);
+      term.sendText(processedCommand, true);
+      
+      // Track command history
+      Terminal._addToHistory(processedCommand, terminalName);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       vscode.window.showErrorMessage(`Command Runner: Failed to execute command - ${errorMessage}`);
       console.error('Command Runner error:', error);
     }
+  }
+
+  static _addToHistory(command: string, terminalName: string) {
+    // Update stats
+    const stats = Terminal.commandStats.get(command) || { count: 0, lastExecuted: new Date() };
+    stats.count++;
+    stats.lastExecuted = new Date();
+    Terminal.commandStats.set(command, stats);
+
+    // Add to history
+    Terminal.commandHistory.unshift({
+      command,
+      timestamp: new Date(),
+      terminalName: terminalName || 'default',
+      executionCount: stats.count
+    });
+
+    // Limit history size
+    if (Terminal.commandHistory.length > Terminal.maxHistorySize) {
+      Terminal.commandHistory = Terminal.commandHistory.slice(0, Terminal.maxHistorySize);
+    }
+  }
+
+  static getCommandStats(command: string): { count: number; lastExecuted: Date } | undefined {
+    return Terminal.commandStats.get(command);
+  }
+
+  static getHistory(): CommandHistoryEntry[] {
+    return [...Terminal.commandHistory];
+  }
+
+  static clearHistory() {
+    Terminal.commandHistory = [];
+    Terminal.commandStats.clear();
   }
 
   static dispose() {

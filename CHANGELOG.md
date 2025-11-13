@@ -4,6 +4,36 @@ All notable changes to the "command-runner" extension will be documented in this
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.5.0] - 2025-11-13
+
+### Added
+- **Variable Substitution:** Support for variables in commands
+  - `${workspaceFolder}`, `${file}`, `${fileBasename}`, `${fileDirname}`, and more
+  - Automatically replaced before command execution
+- **Dangerous Command Detection:** Confirmation prompts for potentially harmful commands
+  - Detects patterns like `rm -rf`, `del /s`, `format`, `dd if=`, etc.
+  - Configurable via `command-runner.confirmDangerousCommands`
+- **Command History:** Track and re-execute previous commands
+  - New command: "Show Command History" - Browse and execute from history
+  - New command: "Clear Command History" - Clear the history
+  - Stores last 50 commands with timestamps and execution counts
+- **Hover Information:** Display execution statistics on command hover
+  - Shows execution count and last run time
+  - Configurable via `command-runner.showHoverInfo`
+- **Customizable Icons:** Choose from multiple CodeLens icons
+  - Options: ▶︎, ►, ▶, ⚡, 🚀, ⚙️, ✦, ●
+  - Configuration: `command-runner.codeLensIcon`
+- **Auto-refresh Time Information:** Automatic updates of time-ago displays
+  - Configurable refresh interval (5-300 seconds)
+  - Updates CodeLens tooltips and hover information dynamically
+- Enhanced tooltips in CodeLens with execution statistics
+
+### Changed
+- Improved decoration hover messages with command details
+- Enhanced CodeLens tooltips with statistics
+- Better command tracking and analytics
+- Time-ago information now updates automatically every 10 seconds (configurable)
+
 ## [0.4.0] - 2025-11-13
 
 ### Added

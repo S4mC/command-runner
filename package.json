@@ -3,7 +3,7 @@
   "displayName": "Command Runner Updated",
   "description": "Run commands in the terminal from markdowns and plain text files with custom display names and named terminals.",
   "publisher": "s4mu31",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "license": "MIT",
   "icon": "icon.png",
   "engines": {
@@ -42,6 +42,16 @@
         "title": "Disable",
         "command": "command-runner.disableCodeLens",
         "category": "Command Runner"
+      },
+      {
+        "title": "Show Command History",
+        "command": "command-runner.showHistory",
+        "category": "Command Runner"
+      },
+      {
+        "title": "Clear Command History",
+        "command": "command-runner.clearHistory",
+        "category": "Command Runner"
       }
     ],
     "configuration": {
@@ -56,15 +66,38 @@
           "default": true,
           "description": "Enable or disable decorative borders around commands"
         },
+        "command-runner.showHoverInfo": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show execution statistics when hovering over commands"
+        },
         "command-runner.decorationBorderColor": {
           "type": "string",
-          "default": "#4d85b4",
+          "default": "#569cd6",
           "description": "Border color for command decorations (hex color code)"
         },
         "command-runner.decorationBackgroundColor": {
           "type": "string",
-          "default": "rgba(77, 133, 180, 0.1)",
+          "default": "rgba(86, 156, 214, 0.1)",
           "description": "Background color for command decorations (rgba or hex color code)"
+        },
+        "command-runner.codeLensIcon": {
+          "type": "string",
+          "default": "▶︎",
+          "enum": ["▶︎", "►", "▶", "⚡", "🚀", "⚙️", "✦", "●"],
+          "description": "Icon to display in CodeLens buttons"
+        },
+        "command-runner.confirmDangerousCommands": {
+          "type": "boolean",
+          "default": true,
+          "description": "Ask for confirmation before executing potentially dangerous commands"
+        },
+        "command-runner.refreshInterval": {
+          "type": "number",
+          "default": 10,
+          "minimum": 5,
+          "maximum": 300,
+          "description": "Interval in seconds to refresh time-ago information in CodeLens and hover tooltips (5-300 seconds)"
         },
         "command-runner.maxDisplayLength": {
           "type": "number",

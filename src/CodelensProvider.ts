@@ -1,4 +1,5 @@
 import * as vscode from "vscode";
+import { Terminal } from "./Terminal";
 
 export class CodelensProvider implements vscode.CodeLensProvider {
   private codeLenses: vscode.CodeLens[] = [];
@@ -18,6 +19,11 @@ export class CodelensProvider implements vscode.CodeLensProvider {
     vscode.workspace.onDidChangeConfiguration((_) => {
       this._onDidChangeCodeLenses.fire();
     });
+  }
+
+  // Method to trigger refresh of CodeLenses
+  public refresh(): void {
+    this._onDidChangeCodeLenses.fire();
   }
 
   public provideCodeLenses(
@@ -54,6 +60,9 @@ export class CodelensProvider implements vscode.CodeLensProvider {
           const maxDisplayLength = vscode.workspace
             .getConfiguration("command-runner")
             .get("maxDisplayLength", 15);
+          const codeLensIcon = vscode.workspace
+            .getConfiguration("command-runner")
+            .get("codeLensIcon", "▶︎");
           
           // Validate and truncate custom name if too long
           if (customName && customName.length > maxCustomNameLength) {
@@ -65,14 +74,19 @@ export class CodelensProvider implements vscode.CodeLensProvider {
             customName = customName.replace(/[<>]/g, '');
           }
           
+          // Get custom icon from configuration
+          const icon = vscode.workspace
+            .getConfiguration("command-runner")
+            .get("codeLensIcon", "▶︎");
+          
           let title: string;
           if (customName) {
-            // If custom name is provided, use only the symbol and the custom name
-            title = `▶︎ ${customName}`;
+            // If custom name is provided, use only the icon and the custom name
+            title = `${icon} ${customName}`;
           } else {
             // Otherwise, use the default format
             const runText: string = cmd.length > maxDisplayLength ? `${cmd.substring(0, maxDisplayLength)}...` : cmd;
-            title = `▶︎ Run \`${runText}\``;
+            title = `${icon} Run \`${runText}\``;
             if (terminalName) {
               title += ` in terminal "${terminalName}"`;
             } else {
@@ -80,9 +94,22 @@ export class CodelensProvider implements vscode.CodeLensProvider {
             }
           }
           
+          // Build tooltip with statistics
+          let tooltip = `${icon}  Run \`${cmd}\``;
+          if (terminalName) {
+            tooltip += ` in terminal "${terminalName}"`;
+          }
+          
+          // Add execution statistics to tooltip
+          const stats = Terminal.getCommandStats(cmd);
+          if (stats) {
+            const timeSince = this._getTimeSince(stats.lastExecuted);
+            tooltip += `\n\n📊  Statistics:\n  • Executed ${stats.count} time${stats.count !== 1 ? 's' : ''}\n  • Last run: ${timeSince}`;
+          }
+          
           const command: vscode.Command = {
             title: title,
-            tooltip: `▶︎ Run \`${cmd}\`${terminalName ? ` in terminal "${terminalName}"` : ''}`,
+            tooltip: tooltip,
             command: "command-runner.codelensAction",
             arguments: [cmd, terminalName],
           };
@@ -92,5 +119,20 @@ export class CodelensProvider implements vscode.CodeLensProvider {
       return this.codeLenses;
     }
     return [];
+  }
+
+  private _getTimeSince(date: Date): string {
+    const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
+    
+    if (seconds < 60) {return `${seconds} second${seconds !== 1 ? 's' : ''} ago`};
+    
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) {return `${minutes} minute${minutes !== 1 ? 's' : ''} ago`};
+    
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) {return `${hours} hour${hours !== 1 ? 's' : ''} ago`};
+    
+    const days = Math.floor(hours / 24);
+    return `${days} day${days !== 1 ? 's' : ''} ago`;
   }
 }

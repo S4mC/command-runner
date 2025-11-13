@@ -56,6 +56,10 @@ run `git status`(Git Status)
 # Combining named terminals with custom display
 run dev`npm run dev`(Start Development)
 run test`npm test -- --watch`(Watch Tests)
+
+# Variable substitution
+run `cd ${workspaceFolder} && npm test`
+run `echo Current file: ${fileBasename}`
 ````
 
 ## Features
@@ -65,32 +69,77 @@ run test`npm test -- --watch`(Watch Tests)
 - Named terminals persist - reuse them for related commands
 - Supports single (\`command\`), double (\``command``), and triple (\```command```) backticks
 - **Custom display names** - personalize button text with parentheses syntax
-- Use descriptive names for better visual organization
-- ▶︎ symbol always visible for quick identification
-- **Visual decorations** - commands are highlighted with a border rectangle for easy identification
+- **Customizable icons** - choose from multiple icon options (▶︎, ⚡, 🚀, etc.)
+- **Visual decorations** - commands highlighted with customizable borders
+- **Hover information** - see execution statistics on hover
+- **Command history** - track and re-execute previous commands
+- **Variable substitution** - use `${workspaceFolder}`, `${file}`, and more
+- **Safety features** - confirmation for dangerous commands
 
 ## Configuration
 
-### Decoration Settings
+### CodeLens Settings
 
-Customize the visual appearance of command decorations:
+- **`command-runner.enableCodeLens`** (default: `true`)  
+  Enable or disable CodeLens for command execution
+
+- **`command-runner.codeLensIcon`** (default: `"▶︎"`)  
+  Choose icon: `"▶︎"`, `"►"`, `"▶"`, `"⚡"`, `"🚀"`, `"⚙️"`, `"✦"`, `"●"`
+
+### Decoration Settings
 
 - **`command-runner.enableDecorations`** (default: `true`)  
   Enable or disable the decorative border around commands
 
-- **`command-runner.decorationBorderColor`** (default: `"#4d85b4"`)  
-  Border color for command decorations (accepts hex color codes)
+- **`command-runner.showHoverInfo`** (default: `true`)  
+  Show execution statistics when hovering over commands
 
-- **`command-runner.decorationBackgroundColor`** (default: `"rgba(77, 133, 180, 0.1)"`)  
-  Background color for command decorations (accepts rgba or hex color codes)
+- **`command-runner.decorationBorderColor`** (default: `"#569cd6"`)  
+  Border color for command decorations (hex color codes)
+
+- **`command-runner.decorationBackgroundColor`** (default: `"rgba(86, 156, 214, 0.1)"`)  
+  Background color for command decorations
+
+### Safety & Behavior
+
+- **`command-runner.confirmDangerousCommands`** (default: `true`)  
+  Confirm before executing dangerous commands
 
 ### Display Settings
 
 - **`command-runner.maxDisplayLength`** (default: `15`)  
-  Maximum length for command display in CodeLens before truncation
+  Maximum command length in CodeLens
 
 - **`command-runner.maxCustomNameLength`** (default: `50`)  
-  Maximum length for custom display names before truncation
+  Maximum custom name length
+
+- **`command-runner.refreshInterval`** (default: `10`)  
+  Refresh interval in seconds for time-ago updates (5-300 seconds)
+
+### Variable Substitution
+
+Use these variables in your commands:
+
+- **`${workspaceFolder}`** - The path of the workspace folder
+- **`${workspaceFolderBasename}`** - The name of the workspace folder without any slashes (/)
+- **`${file}`** - The current opened file absolute path
+- **`${fileBasename}`** - The current opened file's basename (filename with extension)
+- **`${fileBasenameNoExtension}`** - The current opened file's basename without extension
+- **`${fileDirname}`** - The current opened file's directory path
+- **`${relativeFile}`** - The current opened file relative to workspace folder
+
+**Examples:**
+```markdown
+run `cd ${workspaceFolder} && npm test`
+run `echo Current file: ${fileBasename}`
+run `ls ${fileDirname}`
+run `code ${file}`
+```
+
+## Commands
+
+- **Command Runner: Show Command History** - Re-execute commands
+- **Command Runner: Clear Command History** - Clear history
 
 ### Example Configuration
 
@@ -99,8 +148,12 @@ Add these settings to your `settings.json`:
 ```json
 {
   "command-runner.enableDecorations": true,
+  "command-runner.showHoverInfo": true,
+  "command-runner.codeLensIcon": "🚀",
   "command-runner.decorationBorderColor": "#4ec9b0",
   "command-runner.decorationBackgroundColor": "rgba(78, 201, 176, 0.15)",
+  "command-runner.confirmDangerousCommands": true,
+  "command-runner.refreshInterval": 10,
   "command-runner.maxDisplayLength": 20,
   "command-runner.maxCustomNameLength": 60
 }
