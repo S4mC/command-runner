@@ -67,3 +67,41 @@ run test`npm test -- --watch`(Watch Tests)
 - **Custom display names** - personalize button text with parentheses syntax
 - Use descriptive names for better visual organization
 - ▶︎ symbol always visible for quick identification
+- **Visual decorations** - commands are highlighted with a border rectangle for easy identification
+
+## Configuration
+
+### Decoration Settings
+
+Customize the visual appearance of command decorations:
+
+- **`command-runner.enableDecorations`** (default: `true`)  
+  Enable or disable the decorative border around commands
+
+- **`command-runner.decorationBorderColor`** (default: `"#4d85b4"`)  
+  Border color for command decorations (accepts hex color codes)
+
+- **`command-runner.decorationBackgroundColor`** (default: `"rgba(77, 133, 180, 0.1)"`)  
+  Background color for command decorations (accepts rgba or hex color codes)
+
+### Display Settings
+
+- **`command-runner.maxDisplayLength`** (default: `15`)  
+  Maximum length for command display in CodeLens before truncation
+
+- **`command-runner.maxCustomNameLength`** (default: `50`)  
+  Maximum length for custom display names before truncation
+
+### Example Configuration
+
+Add these settings to your `settings.json`:
+
+```json
+{
+  "command-runner.enableDecorations": true,
+  "command-runner.decorationBorderColor": "#4ec9b0",
+  "command-runner.decorationBackgroundColor": "rgba(78, 201, 176, 0.15)",
+  "command-runner.maxDisplayLength": 20,
+  "command-runner.maxCustomNameLength": 60
+}
+```

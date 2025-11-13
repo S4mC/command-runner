@@ -5,13 +5,7 @@ Install dependencies: run `npm install`
 
 ## Development
 
-Compile code once: run build`npm run compile`
-
-Compile in watch mode (auto-recompiles on save): run watch`npm run watch`
-
-Run linter: run lint`npm run lint`
-
-Run tests in "test" terminal: run test`npm run test`
+You just need to run the program from **debug mode** to open a new VSC window and see the extension there.
 
 ## Package Extension to VSIX
 

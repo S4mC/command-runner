@@ -4,6 +4,20 @@ All notable changes to the "command-runner" extension will be documented in this
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.4.0] - 2025-11-13
+
+### Added
+- **Visual Decorations:** Commands are now highlighted with a customizable border rectangle
+- New setting `command-runner.enableDecorations` to toggle decorations on/off
+- New setting `command-runner.decorationBorderColor` to customize border color (default: `#569cd6`)
+- New setting `command-runner.decorationBackgroundColor` to customize background color (default: `rgba(86, 156, 214, 0.1)`)
+- Decorations update in real-time when editing documents
+- Support for custom colors using hex codes or rgba values
+
+### Changed
+- Improved visual feedback for command identification in text
+- Enhanced user experience with better command visibility
+
 ## [0.3.1] - 2025-10-06
 
 ### Fixed

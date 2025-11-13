@@ -3,7 +3,7 @@
   "displayName": "Command Runner Updated",
   "description": "Run commands in the terminal from markdowns and plain text files with custom display names and named terminals.",
   "publisher": "s4mu31",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "license": "MIT",
   "icon": "icon.png",
   "engines": {
@@ -50,6 +50,21 @@
           "type": "boolean",
           "default": true,
           "description": "Enable or disable CodeLens for command execution"
+        },
+        "command-runner.enableDecorations": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable or disable decorative borders around commands"
+        },
+        "command-runner.decorationBorderColor": {
+          "type": "string",
+          "default": "#4d85b4",
+          "description": "Border color for command decorations (hex color code)"
+        },
+        "command-runner.decorationBackgroundColor": {
+          "type": "string",
+          "default": "rgba(77, 133, 180, 0.1)",
+          "description": "Background color for command decorations (rgba or hex color code)"
         },
         "command-runner.maxDisplayLength": {
           "type": "number",
