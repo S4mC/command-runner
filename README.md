@@ -2,7 +2,7 @@
 
 With this extension, you can run code snippets from markdown and plaintext files with powerful customization options.
 
-<img width="1218" alt="image" src="https://github.com/user-attachments/assets/8f9484fa-723d-4de9-ab7f-513e392f1822" />
+<img width="735" alt="image" src="https://github.com/user-attachments/assets/54d20f0f-edc9-49c7-b7cf-ed1ecaab2258" />
 
 
 ## How to Use
