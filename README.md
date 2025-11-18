@@ -1,4 +1,6 @@
-# Command Runner
+# MD Command Runner
+
+Fork of https://github.com/zvikarp/command-runner
 
 With this extension, you can run code snippets from markdown and plaintext files with powerful customization options.
 
